@@ -26,7 +26,7 @@ fg_single_vertex = FeaturedGraph(adj_single_vertex)
             gc = GCNConv(fg, in_channel=>out_channel)
             @test size(gc.weight) == (out_channel, in_channel)
             @test size(gc.bias) == (out_channel,)
-            @test graph(gc.fg) === adj
+            @test adjacency_matrix(gc.fg) == adj
 
             Y = gc(X)
             @test size(Y) == (out_channel, N)
@@ -82,7 +82,7 @@ fg_single_vertex = FeaturedGraph(adj_single_vertex)
             cc = ChebConv(fg, in_channel=>out_channel, k)
             @test size(cc.weight) == (out_channel, in_channel, k)
             @test size(cc.bias) == (out_channel,)
-            @test graph(cc.fg) === adj
+            @test adjacency_matrix(cc.fg) == adj
             @test cc.k == k
             
             Y = cc(X)
@@ -360,7 +360,7 @@ fg_single_vertex = FeaturedGraph(adj_single_vertex)
             gc = GINConv(FeaturedGraph(adj), nn, eps)
             @test size(gc.nn.layers[1].weight) == (out_channel, in_channel)
             @test size(gc.nn.layers[1].bias) == (out_channel, )
-            @test graph(gc.fg) === adj
+            @test adjacency_matrix(gc.fg) == adj
 
             Y = gc(FeaturedGraph(adj, nf=X))
             @test size(node_feature(Y)) == (out_channel, N)

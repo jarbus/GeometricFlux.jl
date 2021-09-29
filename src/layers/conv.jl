@@ -86,7 +86,7 @@ ChebConv(ch::Pair{Int,Int}, k::Int; kwargs...) =
 @functor ChebConv
 
 function (c::ChebConv)(fg::FeaturedGraph, X::AbstractMatrix{T}) where T
-    check_num_nodes(fg, X)
+    GraphSignals.check_num_nodes(fg, X)
     @assert size(X, 1) == size(c.weight, 2) "Input feature size must match input channel size."
     
     L̃ = scaled_laplacian(fg, eltype(X))    
@@ -156,7 +156,7 @@ message(gc::GraphConv, x_i, x_j::AbstractVector, e_ij) = gc.weight2 * x_j
 update(gc::GraphConv, m::AbstractVector, x::AbstractVector) = gc.σ.(gc.weight1*x .+ m .+ gc.bias)
 
 function (gc::GraphConv)(fg::FeaturedGraph, x::AbstractMatrix)
-    check_num_nodes(fg, x)
+    GraphSignals.check_num_nodes(fg, x)
     _, x = propagate(gc, adjacency_list(fg), Fill(0.f0, 0, ne(fg)), x, +)
     x
 end
@@ -263,7 +263,7 @@ function update_batch_vertex(gat::GATConv, M::AbstractMatrix)
 end
 
 function (gat::GATConv)(fg::FeaturedGraph, X::AbstractMatrix)
-    check_num_nodes(fg, X)
+    GraphSignals.check_num_nodes(fg, X)
     _, X = propagate(gat, adjacency_list(fg), Fill(0.f0, 0, ne(fg)), X, +)
     X
 end
@@ -319,7 +319,7 @@ update(ggc::GatedGraphConv, m::AbstractVector, x) = m
 
 
 function (ggc::GatedGraphConv)(fg::FeaturedGraph, H::AbstractMatrix{S}) where {T<:AbstractVector,S<:Real}
-    check_num_nodes(fg, H)
+    GraphSignals.check_num_nodes(fg, H)
     m, n = size(H)
     @assert (m <= ggc.out_ch) "number of input features must less or equals to output features."
     adj = adjacency_list(fg)
@@ -372,7 +372,7 @@ message(ec::EdgeConv, x_i::AbstractVector, x_j::AbstractVector, e_ij) = ec.nn(vc
 update(ec::EdgeConv, m::AbstractVector, x) = m
 
 function (ec::EdgeConv)(fg::FeaturedGraph, X::AbstractMatrix)
-    check_num_nodes(fg, X)
+    GraphSignals.check_num_nodes(fg, X)
     _, X = propagate(ec, adjacency_list(fg), Fill(0.f0, 0, ne(fg)), X, ec.aggr)
     X
 end
@@ -423,7 +423,7 @@ update(g::GINConv, m::AbstractVector, x) = g.nn((1 + g.eps) * x + m)
 
 function (g::GINConv)(fg::FeaturedGraph, X::AbstractMatrix)
     gf = graph(fg)
-    GraphSignals.check_num_node(gf, X)
+    GraphSignals.check_num_nodes(gf, X)
     _, X = propagate(g, adjacency_list(gf), Fill(0.f0, 0, ne(gf)), X, +)
     X
 end
@@ -488,8 +488,8 @@ end
 update(c::CGConv, m::AbstractVector, x) = x + m
 
 function (c::CGConv)(fg::FeaturedGraph, X::AbstractMatrix, E::AbstractMatrix)
-    check_num_nodes(fg, X)
-    check_num_edges(fg, E)
+    GraphSignals.check_num_nodes(fg, X)
+    GraphSignals.check_num_edges(fg, E)
     _, Y = propagate(c, adjacency_list(fg), E, X, +)
     Y
 end
