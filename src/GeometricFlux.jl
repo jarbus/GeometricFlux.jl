@@ -13,6 +13,7 @@ using NNlib, NNlibCUDA
 using GraphLaplacians
 @reexport using GraphSignals
 using LightGraphs
+using Zygote
 
 export
     # layers/graphlayers

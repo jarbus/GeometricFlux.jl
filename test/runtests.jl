@@ -1,5 +1,6 @@
 using GeometricFlux
 using GeometricFlux.Datasets
+using CUDA
 using Flux
 using Flux: @functor
 using FillArrays
@@ -9,6 +10,7 @@ using LinearAlgebra
 using NNlib
 using SparseArrays: SparseMatrixCSC
 using Statistics: mean
+using Zygote
 using Test
 
 cuda_tests = [
@@ -19,14 +21,13 @@ cuda_tests = [
 tests = [
     "layers/gn",
     "layers/msgpass",
-    "layers/conv",
+    # "layers/conv",
     "layers/pool",
     "layers/misc",
     "models",
 ]
 
-if Flux.use_cuda[]
-    using CUDA
+if CUDA.functional()
     using Flux: gpu
     using NNlibCUDA
     append!(tests, cuda_tests)

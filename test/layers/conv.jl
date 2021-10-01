@@ -1,24 +1,23 @@
-in_channel = 3
-in_channel_edge = 1
-out_channel = 5
-N = 4
-T = Float32
-adj = T[0. 1. 0. 1.;
-       1. 0. 1. 0.;
-       0. 1. 0. 1.;
-       1. 0. 1. 0.]
-
-fg = FeaturedGraph(adj)
-    
-adj_single_vertex = T[0. 0. 0. 1.;
-                      0. 0. 0. 0.;
-                      0. 0. 0. 1.;
-                      1. 0. 1. 0.]
-
-fg_single_vertex = FeaturedGraph(adj_single_vertex)
-            
-
 @testset "layer" begin
+    T = Float32
+    in_channel = 3
+    in_channel_edge = 1
+    out_channel = 5
+
+    N = 4
+    E = 4
+    adj = T[0. 1. 0. 1.;
+            1. 0. 1. 0.;
+            0. 1. 0. 1.;
+            1. 0. 1. 0.]
+    fg = FeaturedGraph(adj)
+        
+    adj_isolated_vertex = T[0. 0. 0. 1.;
+                            0. 0. 0. 0.;
+                            0. 0. 0. 1.;
+                            1. 0. 1. 0.]
+    fg_isolated_vertex = FeaturedGraph(adj_isolated_vertex)
+
     @testset "GCNConv" begin
         X = rand(T, in_channel, N)
         Xt = transpose(rand(T, N, in_channel))
@@ -195,13 +194,13 @@ fg_single_vertex = FeaturedGraph(adj_single_vertex)
         Xt = transpose(rand(T, N, in_channel))
 
         @testset "layer with graph" begin
-            for heads = [1, 2], concat = [true, false], adj_gat in [adj, adj_single_vertex]
+            for heads = [1, 2], concat = [true, false], adj_gat in [adj, adj_isolated_vertex]
                 fg_gat = FeaturedGraph(adj_gat)
                 gat = GATConv(fg_gat, in_channel=>out_channel, heads=heads, concat=concat)
 
                 if adj_gat == adj
                     @test adjacency_list(gat.fg) == [[2,4], [1,3], [2,4], [1,3]]
-                elseif adj_gat == adj_single_vertex
+                elseif adj_gat == adj_isolated_vertex
                     @test adjacency_list(gat.fg) == [[4], Int64[], [4], [1, 3]]
                 end
 
@@ -227,7 +226,7 @@ fg_single_vertex = FeaturedGraph(adj_single_vertex)
         end
 
         @testset "layer without graph" begin
-            for heads = [1, 2], concat = [true, false], adj_gat in [adj, adj_single_vertex]
+            for heads = [1, 2], concat = [true, false], adj_gat in [adj, adj_isolated_vertex]
                 fg_gat = FeaturedGraph(adj_gat, nf=X)
                 gat = GATConv(in_channel=>out_channel, heads=heads, concat=concat)
                 @test size(gat.weight) == (out_channel * heads, in_channel)
