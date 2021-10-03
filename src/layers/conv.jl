@@ -89,7 +89,9 @@ function (c::ChebConv)(fg::FeaturedGraph, X::AbstractMatrix{T}) where T
     GraphSignals.check_num_nodes(fg, X)
     @assert size(X, 1) == size(c.weight, 2) "Input feature size must match input channel size."
     
-    L̃ = scaled_laplacian(fg, eltype(X))    
+    L̃ = Zygote.ignore() do
+        scaled_laplacian(fg, eltype(X))
+    end
 
     Z_prev = X
     Z = X * L̃
