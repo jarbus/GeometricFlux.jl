@@ -11,12 +11,6 @@
             0. 1. 0. 1.;
             1. 0. 1. 0.]
     fg = FeaturedGraph(adj)
-        
-    adj_isolated_vertex = T[0. 0. 0. 1.;
-                            0. 0. 0. 0.;
-                            0. 0. 0. 1.;
-                            1. 0. 1. 0.]
-    fg_isolated_vertex = FeaturedGraph(adj_isolated_vertex)
 
     @testset "GCNConv" begin
         X = rand(T, in_channel, N)
@@ -189,20 +183,26 @@
     end
 
     @testset "GATConv" begin
+        adj1 = [1 1 0 1;
+                1 1 1 0;
+                0 1 1 1;
+                1 0 1 1]
+        fg1 = FeaturedGraph(adj1)
+
+        # isolated_vertex
+        adj2 = [1 0 0 1;
+                0 1 0 0;
+                0 0 1 1;
+                1 0 1 1]
+        fg2 = FeaturedGraph(adj2)
 
         X = rand(T, in_channel, N)
         Xt = transpose(rand(T, N, in_channel))
 
         @testset "layer with graph" begin
-            for heads = [1, 2], concat = [true, false], adj_gat in [adj, adj_isolated_vertex]
+            for heads = [1, 2], concat = [true, false], adj_gat in [adj1, adj2]
                 fg_gat = FeaturedGraph(adj_gat)
                 gat = GATConv(fg_gat, in_channel=>out_channel, heads=heads, concat=concat)
-
-                if adj_gat == adj
-                    @test adjacency_list(gat.fg) == [[2,4], [1,3], [2,4], [1,3]]
-                elseif adj_gat == adj_isolated_vertex
-                    @test adjacency_list(gat.fg) == [[4], Int64[], [4], [1, 3]]
-                end
 
                 @test size(gat.weight) == (out_channel * heads, in_channel)
                 @test size(gat.bias) == (out_channel * heads,)
@@ -226,7 +226,7 @@
         end
 
         @testset "layer without graph" begin
-            for heads = [1, 2], concat = [true, false], adj_gat in [adj, adj_isolated_vertex]
+            for heads = [1, 2], concat = [true, false], adj_gat in [adj1, adj2]
                 fg_gat = FeaturedGraph(adj_gat, nf=X)
                 gat = GATConv(in_channel=>out_channel, heads=heads, concat=concat)
                 @test size(gat.weight) == (out_channel * heads, in_channel)

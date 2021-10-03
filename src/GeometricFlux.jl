@@ -68,7 +68,6 @@ include("layers/pool.jl")
 include("models.jl")
 include("layers/misc.jl")
 
-include("cuda/msgpass.jl")
 include("cuda/conv.jl")
 
 using .Datasets

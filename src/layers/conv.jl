@@ -241,12 +241,17 @@ function apply_batch_message(gat::GATConv, i, js, X::AbstractMatrix)
 end
 
 function update_batch_edge(gat::GATConv, sg::SparseGraph, E::AbstractMatrix, X::AbstractMatrix, u)
-    n = nv(sg)
-    # a vertex must always receive a message from itself
-    Zygote.ignore() do
-        GraphLaplacians.add_self_loop!(sg, n)
+    @assert check_self_loops(sg) "a vertex must have self loop (receive a message from itself)."
+    mapreduce(i -> apply_batch_message(gat, i, sg[i], X), hcat, 1:nv(sg))
+end
+
+function check_self_loops(sg::SparseGraph)
+    for i in 1:nv(sg)
+        if !(i in GraphSignals.rowvalview(sg.S, i))
+            return false
+        end
     end
-    mapreduce(i -> apply_batch_message(gat, i, sg[i], X), hcat, 1:n)
+    return true
 end
 
 function update_batch_vertex(gat::GATConv, M::AbstractMatrix, X::AbstractMatrix, u)
@@ -320,8 +325,10 @@ function (ggc::GatedGraphConv)(fg::FeaturedGraph, H::AbstractMatrix{S}) where {T
     m, n = size(H)
     @assert (m <= ggc.out_ch) "number of input features must less or equals to output features."
     if m < ggc.out_ch
-        Hpad = similar(H, S, ggc.out_ch - m, n)
-        H = vcat(H, fill!(Hpad, 0))  # TODO: mutating is not AD compatible
+        Hpad = Zygote.ignore() do
+            fill!(similar(H, S, ggc.out_ch - m, n), 0)
+        end
+        H = vcat(H, Hpad)
     end
     for i = 1:ggc.num_layers
         M = view(ggc.weight, :, :, i) * H
