@@ -242,7 +242,7 @@ end
 
 function update_batch_edge(gat::GATConv, sg::SparseGraph, E::AbstractMatrix, X::AbstractMatrix, u)
     @assert check_self_loops(sg) "a vertex must have self loop (receive a message from itself)."
-    mapreduce(i -> apply_batch_message(gat, i, sg[i], X), hcat, 1:nv(sg))
+    mapreduce(i -> apply_batch_message(gat, i, neighbors(sg, i), X), hcat, 1:nv(sg))
 end
 
 function check_self_loops(sg::SparseGraph)
