@@ -6,9 +6,9 @@ N = 4
 adj = [0 1 0 1;
        1 0 1 0;
        0 1 0 1;
-       1 0 1 0] |> gpu
+       1 0 1 0]
 
-fg = FeaturedGraph(adj)
+fg = FeaturedGraph(adj) |> gpu
 
 @testset "cuda/conv" begin
     @testset "GCNConv" begin

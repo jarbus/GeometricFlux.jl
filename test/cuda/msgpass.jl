@@ -11,8 +11,8 @@
         0. 1. 0. 1. 0. 1.;
         0. 1. 1. 0. 1. 0.]
 
-    struct NewCudaLayer <: MessagePassing
-        weight
+    struct NewCudaLayer{T} <: MessagePassing
+        weight::T
     end
     NewCudaLayer(m, n) = NewCudaLayer(randn(T, m,n))
     @functor NewCudaLayer

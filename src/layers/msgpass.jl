@@ -52,5 +52,5 @@ function update end
 @inline update(mp::MessagePassing, m, x) = m
 @inline update(mp::MessagePassing, i::Integer, m, x) = m
 
-update_edge(mp::MessagePassing, e, vi, vj, u) = GeometricFlux.message(mp, vi, vj, e)
-update_vertex(mp::MessagePassing, ē, vi, u) = GeometricFlux.update(mp, ē, vi)
+@inline update_edge(mp::MessagePassing, e, vi, vj, u) = GeometricFlux.message(mp, vi, vj, e)
+@inline update_vertex(mp::MessagePassing, ē, vi, u) = GeometricFlux.update(mp, ē, vi)
