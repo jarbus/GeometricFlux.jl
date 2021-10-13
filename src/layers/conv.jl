@@ -37,7 +37,9 @@ GCNConv(ch::Pair{Int,Int}, σ = identity; kwargs...) =
 @functor GCNConv
 
 function (l::GCNConv)(fg::FeaturedGraph, x::AbstractMatrix)
-    L̃ = normalized_laplacian(fg, eltype(x); selfloop=true)
+    L̃ = Zygote.ignore() do
+        normalized_laplacian(fg, eltype(x); selfloop=true)
+    end
     l.σ.(l.weight * x * L̃ .+ l.bias)
 end
 
