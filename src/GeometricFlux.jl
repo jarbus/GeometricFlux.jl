@@ -11,7 +11,7 @@ using Flux
 using Flux: glorot_uniform, leakyrelu, GRUCell, @functor
 using NNlib, NNlibCUDA
 @reexport using GraphSignals
-using LightGraphs
+using Graphs
 using Zygote
 
 export
