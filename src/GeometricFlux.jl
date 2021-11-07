@@ -12,8 +12,11 @@ using NNlib, NNlibCUDA
 using GraphLaplacians
 @reexport using GraphSignals
 using Graphs
+using Random
 using Zygote
 using SparseArrays
+using DelimitedFiles
+import Word2Vec: word2vec, wordvectors
 
 export
     # layers/graphlayers
@@ -53,7 +56,7 @@ export
     bypass_graph,
 
     # utils
-    generate_cluster
+    generate_cluster,
 
     #node2vec
     node2vec
