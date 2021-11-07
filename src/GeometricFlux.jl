@@ -13,6 +13,7 @@ using GraphLaplacians
 @reexport using GraphSignals
 using Graphs
 using Zygote
+using SparseArrays
 
 export
     # layers/graphlayers
@@ -54,6 +55,9 @@ export
     # utils
     generate_cluster
 
+    #node2vec
+    node2vec
+
 include("datasets.jl")
 
 include("utils.jl")
@@ -66,6 +70,9 @@ include("layers/conv.jl")
 include("layers/pool.jl")
 include("models.jl")
 include("layers/misc.jl")
+
+include("alias-sampling.jl")
+include("node2vec.jl")
 
 include("cuda/msgpass.jl")
 include("cuda/conv.jl")
